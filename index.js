@@ -7,25 +7,26 @@ const dwReservation = require("./dwReservation");
 const dwFindRv = require("./dwFindRV");
 const cdwrv = require("./controlRv");
 const cdwfrv = require("./controlFindRv");
+const showroom = require("./dwShowRoom");
 // const dwWineImage = require("dwWineImage");
 const app = new Koa();
 app.use(async ctx=>{
     ctx.request.header = {'Access-Control-Allow-Origin': '*'}
     ctx.response.header = {'Content-Type': 'text/json' };
     switch(true){
-        case ctx.path === "/wineCulture":
+        case ctx.path === "/wineCulture"&&ctx.method === "GET":
             let result1 =await dwWineCulture.dw();
             ctx.body = result1;
             break;
-        case ctx.path === "/entrepriseNews":
+        case ctx.path === "/entrepriseNews"&& ctx.method === "GET":
             let result2 =await dwEntrepriseNews.dw();
             ctx.body = result2;
             break;
-        case ctx.path === "/wineImage" :
+        case ctx.path === "/wineImage" && ctx.method === "GET":
             let result3 =await dwWineImage.dw();
             ctx.body = result3;
             break;
-        case ctx.path === "/reservation": 
+        case ctx.path === "/reservation" && ctx.method === "POST": 
             let rsResult1 = await cdwrv.cdw(ctx); //验证用户输入数据的合法性
             let findCondition = {wxid:rsResult1.wxid,dayTime:rsResult1.dayTime};
             let findIndex = await dwFindRv.dw(findCondition);
@@ -41,10 +42,14 @@ app.use(async ctx=>{
                 ctx.body= "exist"
             }
             break;
-        case ctx.path === "/findRv":
+        case ctx.path === "/findRv" && ctx.method === "POST":
             let rsResult2 = await cdwfrv.cdwf(ctx);
             let result5 = await dwFindRv.dw(rsResult2);
             ctx.body = JSON.stringify(result5)
+            break;
+        case ctx.path === "/showRoom" && ctx.method === "GET":
+            let result6 =await showroom.dw();
+            ctx.body = result6;
             break;
         default:
             ctx.status = 404;
